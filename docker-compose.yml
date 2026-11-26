@@ -1,0 +1,45 @@
+services:
+  app:
+    build: .
+    container_name: ktpu_app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env.docker
+    depends_on:
+      - db
+      - redis
+    networks:
+      - ktpu_network
+
+  db:
+    image: postgres:15-alpine
+    container_name: ktpu_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: app_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ktpu_network
+
+  redis:
+    image: redis:alpine
+    container_name: ktpu_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ktpu_network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  ktpu_network:
+    driver: bridge
